@@ -38,7 +38,7 @@ public final class TmdbJsonUtils {
      *
      * @throws JSONException If JSON data cannot be properly parsed
      */
-    public static String[] getSimpleWeatherStringsFromJson(Context context, String jsonStr)
+    public static String[] getSimpleWeatherStringsFromJson(String jsonStr)
             throws JSONException {
 
         final String MOVIE_LIST = "results";
