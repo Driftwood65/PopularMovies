@@ -29,6 +29,14 @@ import java.net.HttpURLConnection;
  */
 public final class TmdbJsonUtils {
 
+
+    public static final String MOVIE_TITLE = "original_title";
+    public static final String MOVIE_ID = "id";
+    public static final String MOVIE_POSTER = "poster_path";
+    public static final String MOVIE_OVERVIEW = "overview";
+    public static final String MOVIE_USER_RATING = "vote_average";
+    public static final String MOVIE_RELEASE_DATE = "release_date";
+
     /**
      * This method parses JSON from a web response and returns an array of Strings
      *
@@ -38,13 +46,10 @@ public final class TmdbJsonUtils {
      *
      * @throws JSONException If JSON data cannot be properly parsed
      */
-    public static String[] getSimpleWeatherStringsFromJson(String jsonStr)
+    public static ContentValues[] getSimpleWeatherStringsFromJson(String jsonStr)
             throws JSONException {
 
         final String MOVIE_LIST = "results";
-        final String MOVIE_TITLE = "title";
-        final String MOVIE_ID = "id";
-        final String MOVIE_POSTER = "poster_path";
 
         final String OWM_MESSAGE_CODE = "cod";
 
@@ -69,12 +74,20 @@ public final class TmdbJsonUtils {
 
         JSONArray movieArray = json.getJSONArray(MOVIE_LIST);
 
-        String[] parsedMovieData = new String[movieArray.length()];
+        ContentValues[] parsedMovieData = new ContentValues[movieArray.length()];
 
         for (int i = 0; i < movieArray.length(); i++) {
             JSONObject movie = movieArray.getJSONObject(i);
 
-            parsedMovieData[i] = movie.getString(MOVIE_TITLE);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MOVIE_ID, movie.getLong(MOVIE_ID));
+            contentValues.put(MOVIE_TITLE, movie.getString(MOVIE_TITLE));
+            contentValues.put(MOVIE_POSTER, movie.getString(MOVIE_POSTER));
+            contentValues.put(MOVIE_OVERVIEW, movie.getString(MOVIE_OVERVIEW));
+            contentValues.put(MOVIE_USER_RATING, movie.getDouble(MOVIE_USER_RATING));
+            contentValues.put(MOVIE_RELEASE_DATE, movie.getString(MOVIE_RELEASE_DATE));
+
+            parsedMovieData[i] = contentValues;
         }
 
         return parsedMovieData;
