@@ -51,26 +51,7 @@ public final class TmdbJsonUtils {
 
         final String MOVIE_LIST = "results";
 
-        final String OWM_MESSAGE_CODE = "cod";
-
-
         JSONObject json = new JSONObject(jsonStr);
-
-        /* Is there an error? */
-        if (json.has(OWM_MESSAGE_CODE)) {
-            int errorCode = json.getInt(OWM_MESSAGE_CODE);
-
-            switch (errorCode) {
-                case HttpURLConnection.HTTP_OK:
-                    break;
-                case HttpURLConnection.HTTP_NOT_FOUND:
-                    /* Location invalid */
-                    return null;
-                default:
-                    /* Server probably down */
-                    return null;
-            }
-        }
 
         JSONArray movieArray = json.getJSONArray(MOVIE_LIST);
 

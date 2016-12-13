@@ -1,14 +1,14 @@
 package com.example.android.popularmovies;
 
 import android.content.ContentValues;
-import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -18,72 +18,92 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
-import java.net.UnknownHostException;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static com.example.android.popularmovies.NetworkUtils.PATH_POPULAR;
 import static com.example.android.popularmovies.NetworkUtils.PATH_TOP_RATED;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ContentValues[]> {
 
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.recyclerview_movies) RecyclerView mRecyclerView;
+    @BindView(R.id.tv_error_message_display) TextView mErrorMessageDisplay;
+    @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
+
     private MovieAdapter mMovieAdapter;
-    private TextView mErrorMessageDisplay;
-    private ProgressBar mLoadingIndicator;
 
     private String path = PATH_POPULAR;
+
+    private int TMDB_API_LOADER = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
-        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
+        ButterKnife.bind(this);
 
         mMovieAdapter = new MovieAdapter();
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        new FetchMovieTask().execute();
+        getSupportLoaderManager().initLoader(TMDB_API_LOADER, null, this);
     }
 
-    class FetchMovieTask extends AsyncTask<Void, Void , ContentValues[]> {
+    @Override
+    public Loader<ContentValues[]> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<ContentValues[]>(this) {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
+            ContentValues[] mMovies = null;
 
-        @Override
-        protected ContentValues[] doInBackground(Void... voids) {
-            URL url = NetworkUtils.buildUrl(path);
-            try {
-                String json = NetworkUtils.getResponseFromHttpUrl(url);
-                return TmdbJsonUtils.getSimpleWeatherStringsFromJson(json);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(ContentValues[] movies) {
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            if(movies != null) {
-                showMovieDataView();
-                mMovieAdapter.setMovies(movies);
-            } else {
-                showErrorMessage();
+            @Override
+            public ContentValues[] loadInBackground() {
+                URL url = NetworkUtils.buildUrl(path);
+                try {
+                    String json = NetworkUtils.getResponseFromHttpUrl(url);
+                    return TmdbJsonUtils.getSimpleWeatherStringsFromJson(json);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
 
+            @Override
+            protected void onStartLoading() {
+                if(mMovies != null) {
+                    deliverResult(mMovies);
+                } else {
+                    mLoadingIndicator.setVisibility(View.VISIBLE);
+                    forceLoad();
+                }
+            }
+
+            @Override
+            public void deliverResult(ContentValues[] data) {
+                mMovies = data;
+                super.deliverResult(data);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<ContentValues[]> loader, ContentValues[] data) {
+        mLoadingIndicator.setVisibility(View.INVISIBLE);
+        if(data != null) {
+            showMovieDataView();
+            mMovieAdapter.setMovies(data);
+        } else {
+            showErrorMessage();
         }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<ContentValues[]> loader) {
+
     }
 
     @Override
@@ -96,11 +116,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == R.id.action_sort_by_popular && !PATH_POPULAR.equals(path)) {
             path = PATH_POPULAR;
-            new FetchMovieTask().execute();
+            getSupportLoaderManager().restartLoader(TMDB_API_LOADER, null, this);
         }
         if(item.getItemId() == R.id.action_sort_by_top_rated && !PATH_TOP_RATED.equals(path)) {
             path = PATH_TOP_RATED;
-            new FetchMovieTask().execute();
+            getSupportLoaderManager().restartLoader(TMDB_API_LOADER, null, this);
         }
 
         return super.onOptionsItemSelected(item);

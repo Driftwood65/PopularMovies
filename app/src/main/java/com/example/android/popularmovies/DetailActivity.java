@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import static butterknife.ButterKnife.*;
 import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_OVERVIEW;
 import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_POSTER;
 import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_RELEASE_DATE;
@@ -27,11 +28,11 @@ public class DetailActivity extends AppCompatActivity {
             if (intent.hasExtra(Intent.EXTRA_TEXT)) {
                 ContentValues contentValues = intent.getParcelableExtra(Intent.EXTRA_TEXT);
 
-                TextView titleTextView = (TextView) findViewById(R.id.tv_title);
-                TextView overviewTextView = (TextView) findViewById(R.id.tv_overview);
-                TextView releaseDateTextView = (TextView) findViewById(R.id.tv_release_date);
-                TextView userRatingTextView = (TextView) findViewById(R.id.tv_user_rating);
-                ImageView posterImageView = (ImageView) findViewById(R.id.iv_poster);
+                TextView titleTextView = findById(this, R.id.tv_title);
+                TextView overviewTextView = findById(this, R.id.tv_overview);
+                TextView releaseDateTextView = findById(this, R.id.tv_release_date);
+                TextView userRatingTextView = findById(this, R.id.tv_user_rating);
+                ImageView posterImageView = findById(this, R.id.iv_poster);
 
                 titleTextView.setText(contentValues.getAsString(MOVIE_TITLE));
                 overviewTextView.setText(contentValues.getAsString(MOVIE_OVERVIEW));

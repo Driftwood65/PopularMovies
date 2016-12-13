@@ -10,12 +10,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_POSTER;
 import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_TITLE;
 
@@ -35,12 +37,24 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     @Override
-    public void onBindViewHolder(MovieAdapterViewHolder holder, int position) {
+    public void onBindViewHolder(final MovieAdapterViewHolder holder, final int position) {
         Context context = holder.mMoviePosterImageView.getContext();
         String posterPath = movies[position].getAsString(MOVIE_POSTER);
         Picasso.with(context)
                 .load(NetworkUtils.buildPosterUrl(posterPath))
-                .into(holder.mMoviePosterImageView);
+                .into(holder.mMoviePosterImageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        holder.mTitle.setVisibility(GONE);
+                        holder.mTitle.setText(movies[position].getAsString(MOVIE_TITLE));
+                    }
+
+                    @Override
+                    public void onError() {
+                        holder.mTitle.setVisibility(VISIBLE);
+                        holder.mTitle.setText(movies[position].getAsString(MOVIE_TITLE));
+                    }
+                });
     }
 
     @Override
@@ -49,11 +63,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     }
 
     class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        final ImageView mMoviePosterImageView;
+        @BindView(R.id.iv_poster) ImageView mMoviePosterImageView;
+        @BindView(R.id.tv_title) TextView mTitle;
 
         public MovieAdapterViewHolder(View itemView) {
             super(itemView);
-            mMoviePosterImageView = (ImageView) itemView.findViewById(R.id.iv_movie_poster);
+            ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 
