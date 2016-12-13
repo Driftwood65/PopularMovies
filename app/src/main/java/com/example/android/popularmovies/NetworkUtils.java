@@ -37,7 +37,9 @@ final class NetworkUtils {
     static final String MOVIES_BASE_URL = "http://api.themoviedb.org/3/movie";
     static final String PATH_TOP_RATED = "top_rated";
     static final String PATH_POPULAR = "popular";
-    private static final String PATH_VIDEOS = "videos";
+    static final String PATH_VIDEOS = "videos";
+    static final String APPEND_TO_RESONSE_PARAM = "append_to_response";
+    static final String APPEND_VALUE = "videos,reviews";
 
     private static final String POSTER_BASE_URL =  "http://image.tmdb.org/t/p/w185";
 
@@ -46,12 +48,17 @@ final class NetworkUtils {
      *
      * @return The URL to use to query the tmdb server.
      */
-    public static URL buildUrl(String... path) {
+    public static URL buildUrl(String path) {
         Uri.Builder builder = Uri.parse(MOVIES_BASE_URL).buildUpon()
+                .appendPath(path)
                 .appendQueryParameter(API_KEY_PARAM, BuildConfig.THE_MOVIE_DB_API_KEY);
 
-        for (String s : path) {
-            builder.appendPath(s);
+        // check if it is a detail call
+        try {
+            Long.parseLong(path);
+            builder.appendQueryParameter(APPEND_TO_RESONSE_PARAM, APPEND_VALUE);
+        } catch (NumberFormatException e) {
+            //ignore
         }
 
         URL url = null;

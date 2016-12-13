@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 URL url = NetworkUtils.buildUrl(path);
                 try {
                     String json = NetworkUtils.getResponseFromHttpUrl(url);
-                    return TmdbJsonUtils.getSimpleWeatherStringsFromJson(json);
+                    return TmdbJsonUtils.getMoviesFromJson(json);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         };
     }
+
 
     @Override
     public void onLoadFinished(Loader<ContentValues[]> loader, ContentValues[] data) {

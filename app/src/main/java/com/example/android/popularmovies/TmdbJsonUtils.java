@@ -36,6 +36,17 @@ public final class TmdbJsonUtils {
     public static final String MOVIE_OVERVIEW = "overview";
     public static final String MOVIE_USER_RATING = "vote_average";
     public static final String MOVIE_RELEASE_DATE = "release_date";
+    public static final String VIDEOS = "videos";
+    public static final String RESULTS = "results";
+    public static final String KEY = "key";
+    public static final String NAME = "name";
+    public static final String SITE = "site";
+    public static final String TYPE = "type";
+    public static final String REVIEWS = "reviews";
+    public static final String CONTENT = "content";
+
+    public static final String YOU_TUBE = "YouTube";
+    public static final String TRAILER = "Trailer";
 
     /**
      * This method parses JSON from a web response and returns an array of Strings
@@ -46,14 +57,12 @@ public final class TmdbJsonUtils {
      *
      * @throws JSONException If JSON data cannot be properly parsed
      */
-    public static ContentValues[] getSimpleWeatherStringsFromJson(String jsonStr)
+    public static ContentValues[] getMoviesFromJson(String jsonStr)
             throws JSONException {
-
-        final String MOVIE_LIST = "results";
 
         JSONObject json = new JSONObject(jsonStr);
 
-        JSONArray movieArray = json.getJSONArray(MOVIE_LIST);
+        JSONArray movieArray = json.getJSONArray(RESULTS);
 
         ContentValues[] parsedMovieData = new ContentValues[movieArray.length()];
 
@@ -74,16 +83,36 @@ public final class TmdbJsonUtils {
         return parsedMovieData;
     }
 
-    /**
-     * Parse the JSON and convert it into ContentValues that can be inserted into our database.
-     *
-     * @param context         An application context, such as a service or activity context.
-     * @param forecastJsonStr The JSON to parse into ContentValues.
-     *
-     * @return An array of ContentValues parsed from the JSON.
-     */
-    public static ContentValues[] getFullWeatherDataFromJson(Context context, String forecastJsonStr) {
-        /** This will be implemented in a future lesson **/
-        return null;
+    public static Movie getMovieFromJson(String jsonStr)
+            throws JSONException {
+
+        JSONObject json = new JSONObject(jsonStr);
+
+        Movie parsedMovieData = new Movie();
+
+        JSONArray videos = json.getJSONObject(VIDEOS).getJSONArray(RESULTS);
+        for (int i = 0; i < videos.length(); i++) {
+            JSONObject video = videos.getJSONObject(i);
+
+            Video parsedVideo = new Video().setKey(video.getString(KEY))
+                    .setName(video.getString(NAME))
+                    .setSite(video.getString(SITE))
+                    .setType(video.getString(TYPE));
+
+            parsedMovieData.addVideo(parsedVideo);
+        }
+
+        JSONArray reviews = json.getJSONObject(REVIEWS).getJSONArray(RESULTS);
+        for (int i = 0; i < reviews.length(); i++) {
+            JSONObject review = reviews.getJSONObject(i);
+
+            Review parsedReview = new Review().setContent(review.getString(CONTENT));
+
+            parsedMovieData.addReview(parsedReview);
+        }
+
+        return parsedMovieData;
     }
+
+
 }
