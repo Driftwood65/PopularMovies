@@ -22,20 +22,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.HttpURLConnection;
-
 /**
  * Utility functions to handle OpenWeatherMap JSON data.
  */
 public final class TmdbJsonUtils {
 
 
-    public static final String MOVIE_TITLE = "original_title";
+    public static final String ORIGINAL_TITLE = "original_title";
     public static final String MOVIE_ID = "id";
-    public static final String MOVIE_POSTER = "poster_path";
-    public static final String MOVIE_OVERVIEW = "overview";
-    public static final String MOVIE_USER_RATING = "vote_average";
-    public static final String MOVIE_RELEASE_DATE = "release_date";
+    public static final String POSTER_PATH = "poster_path";
+    public static final String OVERVIEW = "overview";
+    public static final String VOTE_AVERAGE = "vote_average";
+    public static final String RELEASE_DATE = "release_date";
     public static final String VIDEOS = "videos";
     public static final String RESULTS = "results";
     public static final String KEY = "key";
@@ -71,11 +69,11 @@ public final class TmdbJsonUtils {
 
             ContentValues contentValues = new ContentValues();
             contentValues.put(MOVIE_ID, movie.getLong(MOVIE_ID));
-            contentValues.put(MOVIE_TITLE, movie.getString(MOVIE_TITLE));
-            contentValues.put(MOVIE_POSTER, movie.getString(MOVIE_POSTER));
-            contentValues.put(MOVIE_OVERVIEW, movie.getString(MOVIE_OVERVIEW));
-            contentValues.put(MOVIE_USER_RATING, movie.getDouble(MOVIE_USER_RATING));
-            contentValues.put(MOVIE_RELEASE_DATE, movie.getString(MOVIE_RELEASE_DATE));
+            contentValues.put(ORIGINAL_TITLE, movie.getString(ORIGINAL_TITLE));
+            contentValues.put(POSTER_PATH, movie.getString(POSTER_PATH));
+            contentValues.put(OVERVIEW, movie.getString(OVERVIEW));
+            contentValues.put(VOTE_AVERAGE, movie.getDouble(VOTE_AVERAGE));
+            contentValues.put(RELEASE_DATE, movie.getString(RELEASE_DATE));
 
             parsedMovieData[i] = contentValues;
         }

@@ -23,12 +23,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static butterknife.ButterKnife.*;
-import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_ID;
-import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_OVERVIEW;
-import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_POSTER;
-import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_RELEASE_DATE;
-import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_TITLE;
-import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_USER_RATING;
+import static com.example.android.popularmovies.TmdbJsonUtils.OVERVIEW;
+import static com.example.android.popularmovies.TmdbJsonUtils.POSTER_PATH;
+import static com.example.android.popularmovies.TmdbJsonUtils.RELEASE_DATE;
+import static com.example.android.popularmovies.TmdbJsonUtils.ORIGINAL_TITLE;
+import static com.example.android.popularmovies.TmdbJsonUtils.VOTE_AVERAGE;
 
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Movie>{
 
@@ -56,12 +55,12 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 TextView userRatingTextView = findById(this, R.id.tv_user_rating);
                 ImageView posterImageView = findById(this, R.id.iv_poster);
 
-                titleTextView.setText(contentValues.getAsString(MOVIE_TITLE));
-                overviewTextView.setText(contentValues.getAsString(MOVIE_OVERVIEW));
-                releaseDateTextView.setText(contentValues.getAsString(MOVIE_RELEASE_DATE));
-                userRatingTextView.setText(contentValues.getAsString(MOVIE_USER_RATING));
+                titleTextView.setText(contentValues.getAsString(ORIGINAL_TITLE));
+                overviewTextView.setText(contentValues.getAsString(OVERVIEW));
+                releaseDateTextView.setText(contentValues.getAsString(RELEASE_DATE));
+                userRatingTextView.setText(contentValues.getAsString(VOTE_AVERAGE));
                 Picasso.with(this)
-                        .load(NetworkUtils.buildPosterUrl(contentValues.getAsString(MOVIE_POSTER)))
+                        .load(NetworkUtils.buildPosterUrl(contentValues.getAsString(POSTER_PATH)))
                         .into(posterImageView);
 
                 mVideosListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

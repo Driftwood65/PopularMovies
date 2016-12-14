@@ -18,8 +18,8 @@ import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_POSTER;
-import static com.example.android.popularmovies.TmdbJsonUtils.MOVIE_TITLE;
+import static com.example.android.popularmovies.TmdbJsonUtils.POSTER_PATH;
+import static com.example.android.popularmovies.TmdbJsonUtils.ORIGINAL_TITLE;
 
 /**
  * Created by dmuhm on 09.12.2016.
@@ -39,20 +39,20 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
     @Override
     public void onBindViewHolder(final MovieAdapterViewHolder holder, final int position) {
         Context context = holder.mMoviePosterImageView.getContext();
-        String posterPath = movies[position].getAsString(MOVIE_POSTER);
+        String posterPath = movies[position].getAsString(POSTER_PATH);
         Picasso.with(context)
                 .load(NetworkUtils.buildPosterUrl(posterPath))
                 .into(holder.mMoviePosterImageView, new Callback() {
                     @Override
                     public void onSuccess() {
                         holder.mTitle.setVisibility(GONE);
-                        holder.mTitle.setText(movies[position].getAsString(MOVIE_TITLE));
+                        holder.mTitle.setText(movies[position].getAsString(ORIGINAL_TITLE));
                     }
 
                     @Override
                     public void onError() {
                         holder.mTitle.setVisibility(VISIBLE);
-                        holder.mTitle.setText(movies[position].getAsString(MOVIE_TITLE));
+                        holder.mTitle.setText(movies[position].getAsString(ORIGINAL_TITLE));
                     }
                 });
     }
