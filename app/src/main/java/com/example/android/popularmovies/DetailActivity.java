@@ -2,6 +2,7 @@ package com.example.android.popularmovies;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -14,6 +15,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.data.MovieContract;
+import com.example.android.popularmovies.data.MovieDbHelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -21,13 +24,15 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static butterknife.ButterKnife.*;
-import static com.example.android.popularmovies.TmdbJsonUtils.OVERVIEW;
-import static com.example.android.popularmovies.TmdbJsonUtils.POSTER_PATH;
-import static com.example.android.popularmovies.TmdbJsonUtils.RELEASE_DATE;
-import static com.example.android.popularmovies.TmdbJsonUtils.ORIGINAL_TITLE;
-import static com.example.android.popularmovies.TmdbJsonUtils.VOTE_AVERAGE;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_OVERVIEW;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_POSTER_PATH;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_RELEASE_DATE;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_TMDB_ID;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE;
 
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Movie>{
 
@@ -46,6 +51,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         Intent intent = getIntent();
         if (intent != null) {
             if (intent.hasExtra(Intent.EXTRA_TEXT)) {
+
                 ContentValues contentValues = intent.getParcelableExtra(Intent.EXTRA_TEXT);
 
                 ButterKnife.bind(this);
@@ -55,12 +61,12 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 TextView userRatingTextView = findById(this, R.id.tv_user_rating);
                 ImageView posterImageView = findById(this, R.id.iv_poster);
 
-                titleTextView.setText(contentValues.getAsString(ORIGINAL_TITLE));
-                overviewTextView.setText(contentValues.getAsString(OVERVIEW));
-                releaseDateTextView.setText(contentValues.getAsString(RELEASE_DATE));
-                userRatingTextView.setText(contentValues.getAsString(VOTE_AVERAGE));
+                titleTextView.setText(contentValues.getAsString(COLUMN_ORIGINAL_TITLE));
+                overviewTextView.setText(contentValues.getAsString(COLUMN_OVERVIEW));
+                releaseDateTextView.setText(contentValues.getAsString(COLUMN_RELEASE_DATE));
+                userRatingTextView.setText(contentValues.getAsString(COLUMN_VOTE_AVERAGE));
                 Picasso.with(this)
-                        .load(NetworkUtils.buildPosterUrl(contentValues.getAsString(POSTER_PATH)))
+                        .load(NetworkUtils.buildPosterUrl(contentValues.getAsString(COLUMN_POSTER_PATH)))
                         .into(posterImageView);
 
                 mVideosListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -72,7 +78,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 });
 
                 Bundle queryBundle = new Bundle();
-                queryBundle.putString(MOVIE_ID, contentValues.getAsString(MOVIE_ID));
+                queryBundle.putString(COLUMN_TMDB_ID, contentValues.getAsString(COLUMN_TMDB_ID));
                 getSupportLoaderManager().initLoader(MOVIE_DETAIL_LOADER, queryBundle, this);
             }
         }
@@ -81,7 +87,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<Movie> onCreateLoader(int i, Bundle bundle) {
-        return new MovieDetailLoader(this, bundle.getString(MOVIE_ID));
+        return new MovieDetailLoader(this, bundle.getString(COLUMN_TMDB_ID));
     }
 
     @Override
@@ -103,5 +109,12 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoaderReset(Loader<Movie> loader) {
 
+    }
+
+    @OnClick(R.id.bt_favorite)
+    void storeMovie() {
+        ContentValues contentValues = getIntent().getParcelableExtra(Intent.EXTRA_TEXT);
+        new MovieDbHelper(this).getWritableDatabase()
+                .insert(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
     }
 }

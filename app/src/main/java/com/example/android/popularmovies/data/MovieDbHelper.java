@@ -30,7 +30,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieEntry.COLUMN_RELEASE_DATE      + " TEXT, "                                 +
                 MovieEntry.COLUMN_POSTER_PATH       + " TEXT, "                                 +
                 MovieEntry.COLUMN_OVERVIEW          + " TEXT, "                                 +
-                MovieEntry.COLUMN_VOTE_AVERAGE      + " REAL)"                                  +
+                MovieEntry.COLUMN_VOTE_AVERAGE      + " REAL, "                                  +
 
                 " UNIQUE (" + MovieEntry.COLUMN_TMDB_ID + ") ON CONFLICT REPLACE);";
 

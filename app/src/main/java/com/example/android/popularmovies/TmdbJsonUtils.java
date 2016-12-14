@@ -22,18 +22,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_OVERVIEW;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_POSTER_PATH;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_RELEASE_DATE;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_TMDB_ID;
+import static com.example.android.popularmovies.data.MovieContract.MovieEntry.COLUMN_VOTE_AVERAGE;
+
 /**
  * Utility functions to handle OpenWeatherMap JSON data.
  */
 public final class TmdbJsonUtils {
 
 
-    public static final String ORIGINAL_TITLE = "original_title";
+
     public static final String MOVIE_ID = "id";
-    public static final String POSTER_PATH = "poster_path";
-    public static final String OVERVIEW = "overview";
-    public static final String VOTE_AVERAGE = "vote_average";
-    public static final String RELEASE_DATE = "release_date";
     public static final String VIDEOS = "videos";
     public static final String RESULTS = "results";
     public static final String KEY = "key";
@@ -68,12 +71,12 @@ public final class TmdbJsonUtils {
             JSONObject movie = movieArray.getJSONObject(i);
 
             ContentValues contentValues = new ContentValues();
-            contentValues.put(MOVIE_ID, movie.getLong(MOVIE_ID));
-            contentValues.put(ORIGINAL_TITLE, movie.getString(ORIGINAL_TITLE));
-            contentValues.put(POSTER_PATH, movie.getString(POSTER_PATH));
-            contentValues.put(OVERVIEW, movie.getString(OVERVIEW));
-            contentValues.put(VOTE_AVERAGE, movie.getDouble(VOTE_AVERAGE));
-            contentValues.put(RELEASE_DATE, movie.getString(RELEASE_DATE));
+            contentValues.put(COLUMN_TMDB_ID, movie.getLong(MOVIE_ID));
+            contentValues.put(COLUMN_ORIGINAL_TITLE, movie.getString(COLUMN_ORIGINAL_TITLE));
+            contentValues.put(COLUMN_POSTER_PATH, movie.getString(COLUMN_POSTER_PATH));
+            contentValues.put(COLUMN_OVERVIEW, movie.getString(COLUMN_OVERVIEW));
+            contentValues.put(COLUMN_VOTE_AVERAGE, movie.getDouble(COLUMN_VOTE_AVERAGE));
+            contentValues.put(COLUMN_RELEASE_DATE, movie.getString(COLUMN_RELEASE_DATE));
 
             parsedMovieData[i] = contentValues;
         }

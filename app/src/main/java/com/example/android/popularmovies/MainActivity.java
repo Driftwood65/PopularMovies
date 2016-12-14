@@ -1,6 +1,9 @@
 package com.example.android.popularmovies;
 
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -14,10 +17,16 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.android.popularmovies.data.MovieContract;
+import com.example.android.popularmovies.data.MovieDbHelper;
+
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,9 +41,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
 
     private MovieAdapter mMovieAdapter;
+    private SQLiteDatabase mDb;
 
     private String path = PATH_POPULAR;
-
+    private final String SORT = "sort";
     private int TMDB_API_LOADER = 0;
 
     @Override
@@ -43,13 +53,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mDb = new MovieDbHelper(this).getReadableDatabase();
+
         mMovieAdapter = new MovieAdapter();
 
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        getSupportLoaderManager().initLoader(TMDB_API_LOADER, null, this);
+
+        if (savedInstanceState != null) {
+            path = savedInstanceState.getString(SORT);
+        }
+        if (path != null) {
+            getSupportLoaderManager().initLoader(TMDB_API_LOADER, null, this);
+        } else {
+            mMovieAdapter.swapCursor(getAllFavorites());
+        }
     }
 
     @Override
@@ -94,9 +114,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<ContentValues[]> loader, ContentValues[] data) {
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if(data != null) {
+
+        if(data != null && data.length > 0) {
+            String[] columns = data[0].keySet().toArray(new String[data[0].keySet().size()]);
+            MatrixCursor cursor = new MatrixCursor(columns, data.length);
+            for(ContentValues c : data) {
+                List<Object> values = new ArrayList<>();
+                for(Map.Entry<String, Object> e: c.valueSet()) {
+                    values.add(e.getValue());
+                }
+                cursor.addRow(values);
+            }
+            mMovieAdapter.swapCursor(cursor);
             showMovieDataView();
-            mMovieAdapter.setMovies(data);
+
         } else {
             showErrorMessage();
         }
@@ -123,6 +154,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             path = PATH_TOP_RATED;
             getSupportLoaderManager().restartLoader(TMDB_API_LOADER, null, this);
         }
+        if(item.getItemId() == R.id.action_favorites && path != null) {
+            path = null;
+            getSupportLoaderManager().destroyLoader(TMDB_API_LOADER);
+            mMovieAdapter.swapCursor(getAllFavorites());
+        }
+
 
         return super.onOptionsItemSelected(item);
     }
@@ -135,5 +172,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void showErrorMessage() {
         mRecyclerView.setVisibility(View.INVISIBLE);
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+    }
+
+    private Cursor getAllFavorites() {
+        return mDb.query(
+                MovieContract.MovieEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString(SORT, path);
     }
 }

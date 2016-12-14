@@ -2,7 +2,8 @@
     <string name="app_name">Popular Movies</string>
     <string name="sort_by_popular">sort by popular</string>
     <string name="sort_by_top_rated">sort by top rated</string>
+    <string name="favorites">Favorites</string>
     <string name="error_loading_data">error loading movie data</string>
     <string name="trailers">Trailers</string>
-
+    <string name="favorite">Favorite</string>
 </resources>
